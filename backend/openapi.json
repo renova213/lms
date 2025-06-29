@@ -1,0 +1,1545 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "E-Learning Backend API",
+    "description": "API for e-learning platform with authentication, course management, and student progress tracking",
+    "version": "1.0.0",
+    "contact": {
+      "name": "API Support",
+      "email": "support@elearning.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Development server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "User ID"
+          },
+          "userName": {
+            "type": "string",
+            "description": "Username"
+          },
+          "userEmail": {
+            "type": "string",
+            "format": "email",
+            "description": "User email"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["student", "instructor", "admin"],
+            "description": "User role"
+          }
+        }
+      },
+      "Lecture": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Lecture title"
+          },
+          "videoUrl": {
+            "type": "string",
+            "description": "Video URL"
+          },
+          "public_id": {
+            "type": "string",
+            "description": "Cloudinary public ID"
+          },
+          "freePreview": {
+            "type": "boolean",
+            "description": "Whether lecture is available for free preview"
+          }
+        }
+      },
+      "Course": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "Course ID"
+          },
+          "instructorId": {
+            "type": "string",
+            "description": "Instructor ID"
+          },
+          "instructorName": {
+            "type": "string",
+            "description": "Instructor name"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Course creation date"
+          },
+          "title": {
+            "type": "string",
+            "description": "Course title"
+          },
+          "category": {
+            "type": "string",
+            "description": "Course category"
+          },
+          "level": {
+            "type": "string",
+            "description": "Course level (beginner, intermediate, advanced)"
+          },
+          "primaryLanguage": {
+            "type": "string",
+            "description": "Primary language of the course"
+          },
+          "subtitle": {
+            "type": "string",
+            "description": "Course subtitle"
+          },
+          "description": {
+            "type": "string",
+            "description": "Course description"
+          },
+          "image": {
+            "type": "string",
+            "description": "Course image URL"
+          },
+          "welcomeMessage": {
+            "type": "string",
+            "description": "Welcome message for students"
+          },
+          "pricing": {
+            "type": "number",
+            "description": "Course price"
+          },
+          "objectives": {
+            "type": "string",
+            "description": "Course objectives"
+          },
+          "students": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "studentId": {
+                  "type": "string"
+                },
+                "studentName": {
+                  "type": "string"
+                },
+                "studentEmail": {
+                  "type": "string"
+                },
+                "paidAmount": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "curriculum": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Lecture"
+            }
+          },
+          "isPublised": {
+            "type": "boolean",
+            "description": "Whether course is published"
+          }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "Order ID"
+          },
+          "userId": {
+            "type": "string",
+            "description": "User ID"
+          },
+          "userName": {
+            "type": "string",
+            "description": "User name"
+          },
+          "userEmail": {
+            "type": "string",
+            "description": "User email"
+          },
+          "orderStatus": {
+            "type": "string",
+            "enum": ["pending", "confirmed", "cancelled"],
+            "description": "Order status"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "description": "Payment method"
+          },
+          "paymentStatus": {
+            "type": "string",
+            "enum": ["pending", "paid", "failed"],
+            "description": "Payment status"
+          },
+          "orderDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Order date"
+          },
+          "paymentId": {
+            "type": "string",
+            "description": "Payment ID"
+          },
+          "payerId": {
+            "type": "string",
+            "description": "Payer ID"
+          },
+          "instructorId": {
+            "type": "string",
+            "description": "Instructor ID"
+          },
+          "instructorName": {
+            "type": "string",
+            "description": "Instructor name"
+          },
+          "courseImage": {
+            "type": "string",
+            "description": "Course image URL"
+          },
+          "courseTitle": {
+            "type": "string",
+            "description": "Course title"
+          },
+          "courseId": {
+            "type": "string",
+            "description": "Course ID"
+          },
+          "coursePricing": {
+            "type": "string",
+            "description": "Course price"
+          }
+        }
+      },
+      "CourseProgress": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "Progress ID"
+          },
+          "userId": {
+            "type": "string",
+            "description": "User ID"
+          },
+          "courseId": {
+            "type": "string",
+            "description": "Course ID"
+          },
+          "completed": {
+            "type": "boolean",
+            "description": "Whether course is completed"
+          },
+          "completionDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Completion date"
+          },
+          "lecturesProgress": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "lectureId": {
+                  "type": "string"
+                },
+                "viewed": {
+                  "type": "boolean"
+                },
+                "dateViewed": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "description": "Error message"
+          }
+        }
+      },
+      "Success": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "description": "Success message"
+          },
+          "data": {
+            "type": "object",
+            "description": "Response data"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register a new user",
+        "description": "Create a new user account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userName", "userEmail", "password", "role"],
+                "properties": {
+                  "userName": {
+                    "type": "string",
+                    "description": "Username"
+                  },
+                  "userEmail": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "User email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 6,
+                    "description": "Password"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": ["student", "instructor", "admin"],
+                    "description": "User role"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User registered successfully!"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - User already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Login user",
+        "description": "Authenticate user and return JWT token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userEmail", "password"],
+                "properties": {
+                  "userEmail": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "User email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "Password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Logged in successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "accessToken": {
+                          "type": "string",
+                          "description": "JWT access token"
+                        },
+                        "user": {
+                          "$ref": "#/components/schemas/User"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/check-auth": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Check authentication status",
+        "description": "Verify if user is authenticated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User is authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Authenticated user!"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/User"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/media/upload": {
+      "post": {
+        "tags": ["Media"],
+        "summary": "Upload single file to Cloudinary",
+        "description": "Upload a single file to Cloudinary storage",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "File to upload"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "File uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Cloudinary upload result"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Upload error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/media/bulk-upload": {
+      "post": {
+        "tags": ["Media"],
+        "summary": "Upload multiple files to Cloudinary",
+        "description": "Upload up to 10 files to Cloudinary storage",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    },
+                    "description": "Files to upload (max 10)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Files uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "Cloudinary upload results"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Upload error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/media/delete/{id}": {
+      "delete": {
+        "tags": ["Media"],
+        "summary": "Delete file from Cloudinary",
+        "description": "Delete a file from Cloudinary storage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Cloudinary public ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Asset deleted successfully from cloudinary"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Asset ID required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Delete error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/instructor/course/add": {
+      "post": {
+        "tags": ["Instructor Courses"],
+        "summary": "Add new course",
+        "description": "Create a new course",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Course"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Course created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Course saved successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Course"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/instructor/course/get": {
+      "get": {
+        "tags": ["Instructor Courses"],
+        "summary": "Get all courses",
+        "description": "Retrieve all courses",
+        "responses": {
+          "200": {
+            "description": "Courses retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Course"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/instructor/course/get/details/{id}": {
+      "get": {
+        "tags": ["Instructor Courses"],
+        "summary": "Get course details by ID",
+        "description": "Retrieve specific course details",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Course ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Course details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Course"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Course not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/instructor/course/update/{id}": {
+      "put": {
+        "tags": ["Instructor Courses"],
+        "summary": "Update course by ID",
+        "description": "Update specific course details",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Course ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Course"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Course updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Course updated successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Course"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Course not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/course/get": {
+      "get": {
+        "tags": ["Student Courses"],
+        "summary": "Get all courses for student view",
+        "description": "Retrieve all published courses for students",
+        "responses": {
+          "200": {
+            "description": "Courses retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Course"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/course/get/details/{id}": {
+      "get": {
+        "tags": ["Student Courses"],
+        "summary": "Get course details for student view",
+        "description": "Retrieve specific course details for students",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Course ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Course details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Course"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Course not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/course/purchase-info/{id}/{studentId}": {
+      "get": {
+        "tags": ["Student Courses"],
+        "summary": "Check course purchase information",
+        "description": "Check if student has purchased the course",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Course ID"
+          },
+          {
+            "name": "studentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Student ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Purchase information retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "hasPurchased": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/order/create": {
+      "post": {
+        "tags": ["Orders"],
+        "summary": "Create new order",
+        "description": "Create a new order and initiate PayPal payment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "userName",
+                  "userEmail",
+                  "orderStatus",
+                  "paymentMethod",
+                  "paymentStatus",
+                  "orderDate",
+                  "instructorId",
+                  "instructorName",
+                  "courseImage",
+                  "courseTitle",
+                  "courseId",
+                  "coursePricing"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "userName": {
+                    "type": "string"
+                  },
+                  "userEmail": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "orderStatus": {
+                    "type": "string",
+                    "enum": ["pending", "confirmed", "cancelled"]
+                  },
+                  "paymentMethod": {
+                    "type": "string"
+                  },
+                  "paymentStatus": {
+                    "type": "string",
+                    "enum": ["pending", "paid", "failed"]
+                  },
+                  "orderDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "paymentId": {
+                    "type": "string"
+                  },
+                  "payerId": {
+                    "type": "string"
+                  },
+                  "instructorId": {
+                    "type": "string"
+                  },
+                  "instructorName": {
+                    "type": "string"
+                  },
+                  "courseImage": {
+                    "type": "string"
+                  },
+                  "courseTitle": {
+                    "type": "string"
+                  },
+                  "courseId": {
+                    "type": "string"
+                  },
+                  "coursePricing": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Order created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "approveUrl": {
+                          "type": "string",
+                          "description": "PayPal approval URL"
+                        },
+                        "orderId": {
+                          "type": "string",
+                          "description": "Order ID"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/order/capture": {
+      "post": {
+        "tags": ["Orders"],
+        "summary": "Capture payment and finalize order",
+        "description": "Capture PayPal payment and complete the order",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["paymentId", "payerId", "orderId"],
+                "properties": {
+                  "paymentId": {
+                    "type": "string",
+                    "description": "PayPal payment ID"
+                  },
+                  "payerId": {
+                    "type": "string",
+                    "description": "PayPal payer ID"
+                  },
+                  "orderId": {
+                    "type": "string",
+                    "description": "Order ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Order confirmed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Order confirmed"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Order"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/courses-bought/get/{studentId}": {
+      "get": {
+        "tags": ["Student Courses"],
+        "summary": "Get courses bought by student",
+        "description": "Retrieve all courses purchased by a specific student",
+        "parameters": [
+          {
+            "name": "studentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Student ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Courses retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "userId": {
+                          "type": "string"
+                        },
+                        "courses": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "courseId": {
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "instructorId": {
+                                "type": "string"
+                              },
+                              "instructorName": {
+                                "type": "string"
+                              },
+                              "dateOfPurchase": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "courseImage": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/course-progress/get/{userId}/{courseId}": {
+      "get": {
+        "tags": ["Course Progress"],
+        "summary": "Get current course progress",
+        "description": "Retrieve the current progress of a student in a specific course",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "User ID"
+          },
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Course ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Course progress retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CourseProgress"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/course-progress/mark-lecture-viewed": {
+      "post": {
+        "tags": ["Course Progress"],
+        "summary": "Mark lecture as viewed",
+        "description": "Mark a specific lecture as viewed by the student",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId", "courseId", "lectureId"],
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "User ID"
+                  },
+                  "courseId": {
+                    "type": "string",
+                    "description": "Course ID"
+                  },
+                  "lectureId": {
+                    "type": "string",
+                    "description": "Lecture ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Lecture marked as viewed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Lecture marked as viewed"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CourseProgress"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/course-progress/reset-progress": {
+      "post": {
+        "tags": ["Course Progress"],
+        "summary": "Reset course progress",
+        "description": "Reset the progress of a student in a specific course",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId", "courseId"],
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "User ID"
+                  },
+                  "courseId": {
+                    "type": "string",
+                    "description": "Course ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Course progress reset successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Course progress reset successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CourseProgress"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+} 
